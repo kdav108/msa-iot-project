@@ -8,10 +8,13 @@ import random
 
 # Define device connection strings
 lightSensor = "HostName=msa-project-iot-hub.azure-devices.net;DeviceId=LightSensor;SharedAccessKey=TMH6FAeq0kbF/+E6cbP5tVgTWnAfLi2ZI3lF5OxMpgI="
-message = '{{"LightIntensity": {intensity}, "SoilTension": {tension}}}'
+soilSensor = "HostName=msa-project-iot-hub.azure-devices.net;DeviceId=SoilDevice;SharedAccessKey=9Of1GyYiq4Z70nXL8u82KtgqD/u+t+GLPp81+m3MqO0="
+message_light = '{{"LightIntensity": {intensity}}}'
+message_soil = '{{"SoilTension": {tension}}}'
+# message_light = '{{"LightIntensity": {intensity}, "SoilTension": {tension}}}'
 
 # Create base data
-init_lightIntensity = 40  # In 1000 lux
+init_lightIntensity = 50  # In 1000 lux
 init_soilTension = 40  # In kPa assuming a Tensiometer is used
 desiredTensionMax = 50
 desiredTensionMin = 20
@@ -22,8 +25,9 @@ init_overcast = False  # Represents whether the weather is becoming more overcas
 
 def run_simulation(overcast, lightIntensity, soilTension):
     try:
-        client = IoTHubDeviceClient.create_from_connection_string(lightSensor)
-        print("Light sensor sending periodic messages (press Ctrl-C to exit)" )
+        client_light_sensor = IoTHubDeviceClient.create_from_connection_string(lightSensor)
+        client_tension_sensor = IoTHubDeviceClient.create_from_connection_string(soilSensor)
+        print("Light and soil sensor sending periodic messages (press Ctrl-C to exit)" )
 
         while True:
             if not overcast:
@@ -38,12 +42,12 @@ def run_simulation(overcast, lightIntensity, soilTension):
 
                 # Soil Moisture generally increases if sun light intensity increases
                 # Soil Moisture is measured in kPa so would not fluctuate a lot (i.e an increase/decrease of somewhere
-                # between 0 and 1 is a reasonable assumption)
-                soilTension += random.random()
+                # between 0.01 and 0.1 is a reasonable assumption)
+                soilTension += random.random()/10
 
             else:
                 #  Sunlight decreases
-                lightIntensity -= random.random()
+                lightIntensity -= random.random()/10
 
                 # There's some chance clouds start disappearing
                 if random.random() < 0.01:
@@ -56,26 +60,31 @@ def run_simulation(overcast, lightIntensity, soilTension):
             soilTension = max(soilTension, 0)
 
             # Ensure Light Intensity measurements are valid
-            lightIntensity = min(lightIntensity, 65000)  # Has to be lower than 65000 lux (round figure)
+            lightIntensity = min(lightIntensity, 100000)  # Has to be lower than 65000 lux (round figure)
             lightIntensity = max(lightIntensity, 0.001)  # Has to be greater than 1 lux
 
             # Packet measurements
-            data = Message(message.format(intensity=lightIntensity, tension=soilTension))
+            # data = Message(message.format(intensity=lightIntensity, tension=soilTension))
+            intensity_data = Message(message_light.format(intensity=lightIntensity))
+            soil_data = Message(message_soil.format(tension=soilTension))
 
             # Check if soil tension which is roughly related to it's dryness is within good limits
             if soilTension > desiredTensionMax:
-                data.custom_properties["drynessAlert"] = "True"
-                data.custom_properties["wetnessAlert"] = "False"
+                soil_data.custom_properties["drynessAlert"] = "True"
+                soil_data.custom_properties["wetnessAlert"] = "False"
             elif soilTension < desiredTensionMin:
-                data.custom_properties["drynessAlert"] = "False"
-                data.custom_properties["wetnessAlert"] = "True"
+                soil_data.custom_properties["drynessAlert"] = "False"
+                soil_data.custom_properties["wetnessAlert"] = "True"
             else:
-                data.custom_properties["drynessAlert"] = "False"
-                data.custom_properties["wetnessAlert"] = "False"
+                soil_data.custom_properties["drynessAlert"] = "False"
+                soil_data.custom_properties["wetnessAlert"] = "False"
 
             # Send packet data
             # client.send_message(data)
-            print(data)
+            client_light_sensor.send_message(intensity_data)
+            client_tension_sensor.send_message(soil_data)
+            print(soil_data)
+            print(intensity_data)
 
             # Wait 1 second before sending next message
             time.sleep(1)
