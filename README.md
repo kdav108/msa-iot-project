@@ -18,12 +18,12 @@ Note: A higher soil tension indicates dryer soil.
 - Power BI
 
 ### How to run the code and test it
-Ensure that the relevant libraries are already installed (See Code Dependencies above).
-Replace the {YOUR CONNECTION STRING} place holder with your Azure Iot Hub device connection string (in quotations) - on line 13
-Run the python file (This would start generating randomised simulated data and send it to the cloud - you can view the data sent in the console)
-Check that Azure IoT Hub is recieving the data
-Start Azure Stream Analytics Job to connect the IoT incoming telemtry data to the Power BI output
-Check to see if the data recived in Power BI match the Power BI report in this repository (named 'Enviornment Report - MSA project'). (Note: Due to the data being simulated randomly and depending on how long the code is run, the values may not exactly match those in the Power BI Report in this repository).
+- Ensure that the relevant libraries are already installed (See Code Dependencies above).
+- Replace the {YOUR CONNECTION STRING} place holder with your Azure Iot Hub device connection string (in quotations) - on line 13
+- Run the python file (This would start generating randomised simulated data and send it to the cloud - you can view the data sent in the console)
+- Check that Azure IoT Hub is recieving the data
+- Start Azure Stream Analytics Job to connect the IoT incoming telemtry data to the Power BI output
+- Check to see if the data recived in Power BI match the Power BI report in this repository (named 'Enviornment Report - MSA project'). (Note: Due to the data being simulated randomly and depending on how long the code is run, the values may not exactly match those in the Power BI Report in this repository).
 
 ### Contributor/s
 KUNJ DAVE
