@@ -10,7 +10,7 @@ from azure.iot.device import IoTHubDeviceClient, Message
 
 
 # Define device connection strings
-environmentSensor = "HostName=msa-project-iot-hub.azure-devices.net;DeviceId=LightSensor;SharedAccessKey=TMH6FAeq0kbF/+E6cbP5tVgTWnAfLi2ZI3lF5OxMpgI="
+environmentSensor = "{YOUR CONNECTION STRING}"
 message = '{{"LightIntensity": {intensity}, "SoilTension": {tension}}}'
 
 # Create base data
