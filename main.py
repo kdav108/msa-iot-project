@@ -26,11 +26,11 @@ init_overcast = False  # Represents whether the weather is becoming more overcas
 def run_simulation(overcast, lightIntensity, soilTension):
     try:
         client = IoTHubDeviceClient.create_from_connection_string(environmentSensor)
-        print("Light and soil sensor sending periodic messages (press Ctrl-C to exit)" )
+        print("Light and soil sensor sending periodic messages: (press Ctrl-C to exit)" )
 
         while True:
             if not overcast:
-                # Sunlight keeps increasing
+                # Sunlight increases throughout the day
                 lightIntensity += random.random()/100
 
                 # There's some chance clouds start obscuring the sky again
@@ -64,8 +64,6 @@ def run_simulation(overcast, lightIntensity, soilTension):
 
             # Packet measurements
             data = Message(message.format(intensity=lightIntensity, tension=soilTension))
-            # intensity_data = Message(message_light.format(intensity=lightIntensity))
-            # soil_data = Message(message_soil.format(tension=soilTension))
 
             # Check if soil tension which is roughly related to it's dryness is within good limits
             if soilTension > desiredTensionMax:
@@ -81,7 +79,6 @@ def run_simulation(overcast, lightIntensity, soilTension):
             # Send packet data
             client.send_message(data)
             print(data)
-
 
             # Wait a second before sending next message
             time.sleep(1)
