@@ -15,7 +15,7 @@ message = '{{"LightIntensity": {intensity}, "SoilTension": {tension}}}'
 
 # Create base data
 init_lightIntensity = 50  # In 1000 lux
-init_soilTension = 40  # In kPa assuming a Tensiometer is used
+init_soilTension = 20  # In kPa assuming a Tensiometer is used
 desiredTensionMax = 50
 desiredTensionMin = 20
 
@@ -52,14 +52,14 @@ def run_simulation(overcast, lightIntensity, soilTension):
                 if random.random() < 0.05:
                     overcast = False
 
-                soilTension -= random.random()/100
+                soilTension -= random.random()/1000
 
             # Check if soilMoisture is still valid (it cannot exceed 80 or fall below 0 is using a Tensiometer)
             soilTension = min(soilTension, 80)
             soilTension = max(soilTension, 0)
 
             # Ensure Light Intensity measurements are valid
-            lightIntensity = min(lightIntensity, 100000)  # Has to be lower than 65000 lux (round figure)
+            lightIntensity = min(lightIntensity, 100000)  # Has to be lower than 100000 lux (typical hot day)
             lightIntensity = max(lightIntensity, 0.001)  # Has to be greater than 1 lux
 
             # Packet measurements
